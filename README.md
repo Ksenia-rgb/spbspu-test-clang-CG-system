@@ -1,0 +1,1 @@
+# spbspu-test-clang-CG-system
