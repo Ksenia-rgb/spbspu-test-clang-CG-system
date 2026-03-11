@@ -1,0 +1,229 @@
+# Version 3
+
+.PHONY: all labs clean all-dockers
+.SECONDEXPANSION:
+.SECONDARY:
+
+BOOST_LOCATION := $(shell test -f .boost_location && cat .boost_location ; true)
+DOCKER_IMAGE ?= volgarenok/cxx-test:latest
+
+ifneq 'yes' '$(VERBOSE)'
+hidecmd := @
+endif
+# The variable SILENT controls additional messages
+
+CPPFLAGS += -Wall -Wextra -Werror -Wno-missing-field-initializers -Werror=vla -Wold-style-cast $(if $(BOOST_LOCATION),-isystem $(BOOST_LOCATION))
+CXXFLAGS += -g
+
+system   := $(shell uname)
+
+ifneq 'MINGW' '$(patsubst MINGW%,MINGW,$(system))'
+CPPFLAGS += -std=c++14
+else
+CPPFLAGS += -std=gnu++14
+endif
+
+ZIP_CMD := zip
+ifeq 'Darwin' '$(system)'
+TIMEOUT_CMD := gtimeout
+else
+TIMEOUT_CMD := timeout
+endif
+
+students := $(filter-out out Makefile README.md,$(wildcard *))
+labs     := $(foreach student,$(students),$(wildcard $(student)/??) $(wildcard $(student)/??.?))
+
+student            = $(word 1,$(subst /, ,$(1)))
+
+lab_test_sources   = $(wildcard $(1)/test-*.cpp)
+lab_sources        = $(filter-out $(1)/test-%,$(wildcard $(1)/*.cpp))
+lab_headers        = $(wildcard $(1)/*.h) $(wildcard $(1)/*.hpp) $(wildcard $(1)/*.hxx)
+lab_common_sources = $(if $(wildcard $(1)/common),$(filter-out $(1)/common/test-%.cpp,$(wildcard $(1)/common/*.cpp)))
+lab_common_tests   = $(if $(wildcard $(1)/common),$(wildcard $(1)/common/test-*.cpp))
+lab_common_headers = $(if $(wildcard $(1)/common),$(wildcard $(1)/common/*.h) $(wildcard $(1)/common/*.hpp) $(wildcard $(1)/common/*.hxx))
+
+lab_objects        = $(patsubst %.cpp,out/%.o,$(call lab_sources,$(1)) $(call lab_common_sources,$(call student,$(1))))
+lab_test_objects   = $(patsubst %.cpp,out/%.o,$(call lab_test_sources,$(1)) $(call lab_common_tests,$(call student,$(1))))
+lab_header_checks  = $(addprefix out/,$(addsuffix .header,$(call lab_headers,$(1)) $(call lab_common_headers,$(call student,$(1)))))
+
+objects           := $(sort $(foreach lab,$(labs),$(call lab_objects,$(lab))))
+test_objects      := $(sort $(foreach lab,$(labs),$(call lab_test_objects,$(lab))))
+header_checks     := $(sort $(foreach lab,$(labs),$(call lab_header_checks,$(lab))))
+
+common_include     = $(if $(wildcard $(call student,$(1))/common),-I$(call student,$(1))/common -I$(call student,$(1))/common/include)
+
+all: $(addprefix build-,$(labs))
+
+labs:
+	@echo $(labs)
+
+all-dockers: $(addprefix docker-test-,$(labs))
+
+$(addprefix run-,$(labs)): run-%: out/%/lab
+	@$(FAULT_INJECTION_CONFIG) $(if $(TIMEOUT),$(TIMEOUT_CMD) --signal=KILL $(TIMEOUT)s )$(if $(VALGRIND),valgrind $(VALGRIND) )$< $(ARGS)
+
+clean:
+	rm -rf out
+
+$(addprefix build-,$(labs)): build-%: out/%/lab
+
+$(addprefix zip-,$(labs)): zip-%: out/%/src-lab
+
+$(addprefix test-,$(labs)): test-%: out/%/test-lab
+	$(if $(SILENT),,@echo [TEST] $(patsubst out/%/test-lab,%,$<))
+	$(hidecmd)$(if $(TIMEOUT),$(TIMEOUT_CMD) --signal=KILL $(TIMEOUT)s )$(if $(VALGRIND),valgrind $(VALGRIND) )$< $(TEST_ARGS)
+
+out/%/src-lab: Makefile $$(call lab_sources,%) $$(call lab_headers,%) $$(call lab_common_sources,$$(call student,%)) $$(call lab_common_headers,$$(call student,%)) | $$(@D)/.dir
+	$(if $(SILENT),,@echo [ZIP ] $(patsubst out/%/lab-src,%,$@))
+	$(hidecmd)$(ZIP_CMD) -r $@ $^
+
+out/%/lab: $$(call lab_objects,%) $$(call lab_header_checks,%) | $$(@D)/.dir
+	$(if $(SILENT),,@echo [LINK] $(patsubst out/%/lab,%,$@))
+	$(hidecmd)$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $(filter-out %.header,$^)
+
+out/%/test-lab: $$(call lab_test_objects,%) $$(call lab_objects,%) | $$(@D)/.dir
+	$(if $(SILENT),,@echo [LINK] $(patsubst out/%/test-lab,%,$@))
+	$(hidecmd)$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $(filter-out %/main.o,$^)
+
+$(test_objects): out/%.o: %.cpp | $$(@D)/.dir
+	$(if $(SILENT),,@echo [C++ ] $<)
+	$(hidecmd)$(CXX) $(CPPFLAGS) $(CXXFLAGS) -Wno-old-style-cast -Wno-unused-parameter -MMD -MP -c $(call common_include,$<) -o $@ $<
+
+$(objects): out/%.o: %.cpp | $$(@D)/.dir
+	$(if $(SILENT),,@echo [C++ ] $<)
+	$(hidecmd)$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -c $(call common_include,$<) -o $@ $<
+
+$(header_checks): out/%.header: % | $$(@D)/.dir
+	$(if $(SILENT),,@echo [HDR ] $<)
+	$(hidecmd)$(CXX) $(CPPFLAGS) $(CXXFLAGS) -Wno-unused-const-variable -c $(call common_include,$<) -fsyntax-only $<
+	@touch $@
+
+%/.dir:
+	@mkdir -p $(@D) && touch $@
+
+check-docker:
+	@which docker > /dev/null || (echo "Docker not installed. Run (Ubuntu/Debian):\nsudo apt install docker.io" && exit 1)
+	@docker version > /dev/null 2>&1 || (echo "Docker permission denied. Run:\nsudo usermod -aG docker $$USER\nThen re-login" && exit 1)
+
+$(addprefix doctest-,$(labs)): doctest-%: check-docker
+	$(eval student := $(word 1,$(subst /, ,$*)))
+	$(eval lab     := $(notdir $*))
+
+	@docker run --rm \
+		-v $(PWD):/workspace \
+		-w /workspace \
+		-e LAB=$(lab) \
+		-e STUDENT=$(student) \
+		-e BASE_BRANCH=origin/master \
+		$(DOCKER_IMAGE) \
+		/bin/bash -c "\
+			cd /workspace && \
+			echo '===   build    ===' && \
+			make build-$(student)/$(lab) && \
+			echo '=== acceptance ===' && \
+			/spbspu-labs-tests/test-lab-$(lab) $(student) out/$(student)/$(lab)/acceptance.xml || true && \
+			sleep 2s && \
+			echo '===  results   ===' && \
+			xsltproc -o 'out/$(student)/$(lab)/acceptance.md' \
+			'/spbspu-labs-tests/report-md.xslt' \
+			'out/$(student)/$(lab)/acceptance.xml' && \
+			cat out/$(student)/$(lab)/acceptance.md"
+
+	@rm -f vgcore.*
+
+check-clang-format:
+	$(eval LATEST_CLANG_FORMAT := $(shell find /usr/bin /bin -name "clang-format*" -printf "%f\n" | \
+    grep -E "clang-format-[0-9]+$$" | \
+    sort -V | \
+    awk -F- '$$NF >= 20' | \
+    tail -n1))
+	
+	@if [ "$(LATEST_CLANG_FORMAT)" = "" ]; then \
+		echo "[FORMAT] clang-format not installed or have version under 20"; \
+		exit 1; \
+	fi
+
+$(addprefix format-,$(labs)): format-%: check-clang-format
+	$(eval check := $(if $(filter --check,$(ARGS)),1,$(if $(ARGS),0,1)))
+	$(eval fix := $(if $(filter --fix,$(ARGS)),1,0))
+	$(eval format_general := ../linters/format/.clang-format)
+	$(eval format_break := ../linters/format/format-break/.clang-format)
+	$(eval format_egypt := ../linters/format/format-egypt/.clang-format)
+	$(eval format_write := ./.clang-format)
+
+	@if [ $(check) = 0 ] && [ $(fix) = 0 ]; then \
+		echo "[FORMAT] Incorrect command args"; \
+		exit 1; \
+	fi
+
+	$(eval files_sources := $(call lab_sources,$*))
+	$(eval files_headers := $(call lab_headers,$*))
+	$(eval files_tests := $(call lab_test_sources,$*))
+	$(eval files_common_sources := $(call lab_common_sources,$(call student,$*)))
+	$(eval files_common_headers := $(call lab__common_headers,$(call student,$*)))
+	$(eval files_common_tests := $(call lab_common_tests,$(call student,$*)))
+	$(eval files_all := $(files_sources) $(files_headers) $(files_tests) \
+		$(files_common_sources) $(files_common_headers) $(files_common_tests))
+
+	@touch .clang-format
+	
+	@python3 ../scripts/format/complete-format-with-parentheses.py \
+		$(format_write) $(format_general) $(format_break) $(format_egypt) $(files_all)
+
+	@if [ $(check) = 1 ]; then \
+	echo "[FORMAT] check files"; \
+		python3 ../scripts/format/check-comments.py "--check" $(files_all); \
+		python3 ../scripts/format/check-std-spaces.py "--check" $(files_all); \
+		python3 ../scripts/format/check-alias-length.py "--check" $(files_all); \
+		$(LATEST_CLANG_FORMAT) -style=file:.clang-format -n $(files_all); \
+	fi
+	@if [ $(fix) = 1 ]; then \
+		echo "[FORMAT] fix files"; \
+		python3 ../scripts/format/fix-comments.py "--fix" $(files_all); \
+		python3 ../scripts/format/fix-std-spaces.py "--fix" $(files_all); \
+		$(LATEST_CLANG_FORMAT) -style=file:.clang-format -i $(files_all); \
+	fi
+
+	@rm .clang-format
+
+check-clang-tidy:
+	$(eval LATEST_CLANG_TIDY := $(shell find /usr/bin /bin -name "clang-tidy*" -printf "%f\n" | \
+    grep -E "clang-tidy-[0-9]+$$" | \
+    sort -V | \
+    awk -F- '$$NF >= 20' | \
+    tail -n1))
+	
+	@if [ "$(LATEST_CLANG_TIDY)" = "" ]; then \
+		echo "[TIDY] clang-tidy not installed or have version under 20"; \
+		exit 1; \
+	fi
+
+$(addprefix tidy-,$(labs)): tidy-%: check-clang-tidy
+	$(eval tidy_general := ../linters/tidy/.clang-tidy)
+	$(eval tidy_camel := ../linters/tidy/tidy-camel/.clang-tidy)
+	$(eval tidy_lower := ../linters/tidy/tidy-lower/.clang-tidy)
+	$(eval tidy_write := ./.clang-tidy)
+
+	$(eval files_sources := $(call lab_sources,$*))
+	$(eval files_headers := $(call lab_headers,$*))
+	$(eval files_tests := $(call lab_test_sources,$*))
+	$(eval files_common_sources := $(call lab_common_sources,$(call student,$*)))
+	$(eval files_common_headers := $(call lab__common_headers,$(call student,$*)))
+	$(eval files_common_tests := $(call lab_common_tests,$(call student,$*)))
+	$(eval files_all := $(files_sources) $(files_headers) $(files_tests) \
+		$(files_common_sources) $(files_common_headers) $(files_common_tests))
+
+	@touch .clang-tidy
+
+	@python3 -m venv libclang_env_test
+	@libclang_test/bin/activate && pip install libclang
+	@libclang_test/bin/activate && python3 ../scripts/tidy/complete-tidy-with-case.py \
+		$(tidy_write) $(tidy_general) $(tidy_camel) $(tidy_lower) $(files_all)
+
+	@echo "[TIDY] check files"
+	@$(LATEST_CLANG_TIDY) --config-file=.clang-tidy $(files_all)
+
+	@rm -rf libckang_env
+	@rm .clang-tidy
+
+include $(wildcard $(patsubst %.o,%.d,$(objects) $(test_objects)))
