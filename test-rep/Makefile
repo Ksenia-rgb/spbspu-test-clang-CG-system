@@ -1,4 +1,4 @@
-# Version 3
+# Version 4 
 
 .PHONY: all labs clean all-dockers
 .SECONDEXPANSION:
@@ -215,12 +215,11 @@ $(addprefix tidy-,$(labs)): tidy-%: check-clang-tidy
 
 	@touch .clang-tidy
 
-	# Replace by c++ checker, built in executable file
 	@python3 ../scripts/tidy/complete-tidy-with-case.py \
 		$(tidy_write) $(tidy_general) $(tidy_camel) $(tidy_lower) $(files_all)
 
 	@echo "[TIDY] check files"
-	@$(LATEST_CLANG_TIDY) --config-file=.clang-tidy $(files_all)
+	@$(LATEST_CLANG_TIDY) --fix --config-file=.clang-tidy $(files_all)
 
 	@rm .clang-tidy
 
