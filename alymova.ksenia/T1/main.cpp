@@ -7,7 +7,8 @@
 #include "note-bd-commands.hpp"
 #include "note-bd.hpp"
 
-int main() {
+int main()
+{
   using namespace alymova;
   using namespace std::placeholders;
 
@@ -26,16 +27,12 @@ int main() {
 
   std::string command;
   while (std::cin >> command) {
-    try
-    {
+    try {
       commands.at(command)(std::cin, bd);
-      if (command == "show" || command == "mind" || command == "expired")
-      {
+      if (command == "show" || command == "mind" || command == "expired") {
         std::cout << '\n';
       }
-    }
-    catch (const std::exception& e)
-    {
+    } catch (const std::exception& e) {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       std::cout << "<INVALID COMMAND>\n";

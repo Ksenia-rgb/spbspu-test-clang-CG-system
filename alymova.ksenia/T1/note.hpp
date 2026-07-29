@@ -5,10 +5,8 @@
 #include <string>
 #include <memory>
 
-namespace alymova
-{
-  class Note
-  {
+namespace alymova {
+  class Note {
   public:
     Note(const std::string& name);
     void addLine(const std::string& line);

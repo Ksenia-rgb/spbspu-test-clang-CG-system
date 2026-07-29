@@ -6,10 +6,8 @@
 #include <memory>
 #include "note.hpp"
 
-namespace alymova
-{
-  class NoteBd
-  {
+namespace alymova {
+  class NoteBd {
   public:
     NoteBd();
     void createNote(const std::string& name);

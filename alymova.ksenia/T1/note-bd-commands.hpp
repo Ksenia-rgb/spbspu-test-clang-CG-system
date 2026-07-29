@@ -4,8 +4,7 @@
 #include <ostream>
 #include "note-bd.hpp"
 
-namespace alymova
-{
+namespace alymova {
   void note(std::istream& in, NoteBd& bd);
   void line(std::istream& in, NoteBd& bd);
   void show(std::istream& in, std::ostream& out, const NoteBd& bd);
