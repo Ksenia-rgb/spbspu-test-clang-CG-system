@@ -30,6 +30,9 @@ else
 TIMEOUT_CMD := timeout
 endif
 
+CLANG_FORMAT_MIN := 20
+CLANG_TIDY_MIN := 20
+
 students := $(filter-out out Makefile README.md,$(wildcard *))
 labs     := $(foreach student,$(students),$(wildcard $(student)/??) $(wildcard $(student)/??.?))
 
@@ -132,23 +135,29 @@ $(addprefix doctest-,$(labs)): doctest-%: check-docker
 	@rm -f vgcore.*
 
 check-clang-format:
-	$(eval LATEST_CLANG_FORMAT := $(shell find /usr/bin /bin -name "clang-format*" -printf "%f\n" | \
-    grep -E "clang-format-[0-9]+$$" | \
-    sort -V | \
-    awk -F- '$$NF >= 20' | \
-    tail -n1))
-	
+	$(eval LATEST_CLANG_FORMAT := $(shell \
+    V=$$(clang-format --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' | head -1 | cut -d. -f1); \
+    if [ -n "$$V" ] && [ $$V -ge $(CLANG_FORMAT_MIN) ]; then \
+      echo "clang-format"; \
+    else \
+      find /usr/bin /bin -name "clang-format*" -printf "%f\n" 2>/dev/null | \
+        grep -E "clang-format-[0-9]+$$" | \
+        sort -V | \
+        awk -F- '$$NF >= $(CLANG_FORMAT_MIN)' | \
+        tail -n1; \
+    fi))
+		
 	@if [ "$(LATEST_CLANG_FORMAT)" = "" ]; then \
-		echo "[FORMAT] clang-format not installed or have version under 20"; \
+		echo "[FORMAT] clang-format not installed or have version under $(CLANG_FORMAT_MIN)"; \
 		exit 1; \
 	fi
 
 $(addprefix format-,$(labs)): format-%: check-clang-format
 	$(eval check := $(if $(filter --check,$(ARGS)),1,$(if $(ARGS),0,1)))
 	$(eval fix := $(if $(filter --fix,$(ARGS)),1,0))
-	$(eval format_general := ../linters/format/.clang-format)
-	$(eval format_break := ../linters/format/format-break/.clang-format)
-	$(eval format_egypt := ../linters/format/format-egypt/.clang-format)
+	$(eval format_general := cg/linters/format/.clang-format)
+	$(eval format_break := cg/linters/format/format-break/.clang-format)
+	$(eval format_egypt := cg/linters/format/format-egypt/.clang-format)
 	$(eval format_write := ./.clang-format)
 
 	@if [ $(check) = 0 ] && [ $(fix) = 0 ]; then \
@@ -167,7 +176,7 @@ $(addprefix format-,$(labs)): format-%: check-clang-format
 
 	@touch .clang-format
 	
-	@python3 ../scripts/format/complete-format-with-parentheses.py \
+	@python3 cg/scripts/format/complete-format-with-parentheses.py \
 		$(format_write) $(format_general) $(format_break) $(format_egypt) $(files_all)
 
 	@if [ $(check) = 1 ]; then \
@@ -179,29 +188,35 @@ $(addprefix format-,$(labs)): format-%: check-clang-format
 	fi
 	@if [ $(fix) = 1 ]; then \
 		echo "[FORMAT] fix files"; \
-		python3 ../scripts/format/fix-comments.py "--fix" $(files_all); \
-		python3 ../scripts/format/fix-std-spaces.py "--fix" $(files_all); \
+		python3 cg/scripts/format/fix-comments.py "--fix" $(files_all); \
+		python3 cg/scripts/format/fix-std-spaces.py "--fix" $(files_all); \
 		$(LATEST_CLANG_FORMAT) -style=file:.clang-format -i $(files_all); \
 	fi
 
 	@rm .clang-format
 
 check-clang-tidy:
-	$(eval LATEST_CLANG_TIDY := $(shell find /usr/bin /bin -name "clang-tidy*" -printf "%f\n" | \
-    grep -E "clang-tidy-[0-9]+$$" | \
-    sort -V | \
-    awk -F- '$$NF >= 20' | \
-    tail -n1))
-	
+	$(eval LATEST_CLANG_TIDY := $(shell \
+    V=$$(clang-tidy --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' | head -1 | cut -d. -f1); \
+    if [ -n "$$V" ] && [ $$V -ge $(CLANG_TIDY_MIN) ]; then \
+      echo "clang-tidy"; \
+    else \
+      find /usr/bin /bin -name "clang-tidy*" -printf "%f\n" 2>/dev/null | \
+        grep -E "clang-tidy-[0-9]+$$" | \
+        sort -V | \
+        awk -F- '$$NF >= $(CLANG_TIDY_MIN)' | \
+        tail -n1; \
+    fi))
+		
 	@if [ "$(LATEST_CLANG_TIDY)" = "" ]; then \
-		echo "[TIDY] clang-tidy not installed or have version under 20"; \
+		echo "[TIDY] clang-tidy not installed or have version under $(CLANG_TIDY_MIN)"; \
 		exit 1; \
 	fi
 
 $(addprefix tidy-,$(labs)): tidy-%: check-clang-tidy
-	$(eval tidy_general := ../linters/tidy/.clang-tidy)
-	$(eval tidy_camel := ../linters/tidy/tidy-camel/.clang-tidy)
-	$(eval tidy_lower := ../linters/tidy/tidy-lower/.clang-tidy)
+	$(eval tidy_general := cg/linters/tidy/.clang-tidy)
+	$(eval tidy_camel := cg/linters/tidy/tidy-camel/.clang-tidy)
+	$(eval tidy_lower := cg/linters/tidy/tidy-lower/.clang-tidy)
 	$(eval tidy_write := ./.clang-tidy)
 
 	$(eval files_sources := $(call lab_sources,$*))
@@ -215,11 +230,11 @@ $(addprefix tidy-,$(labs)): tidy-%: check-clang-tidy
 
 	@touch .clang-tidy
 
-	@python3 ../scripts/tidy/complete-tidy-with-case.py \
+	@python3 cg/scripts/tidy/complete-tidy-with-case.py \
 		$(tidy_write) $(tidy_general) $(tidy_camel) $(tidy_lower) $(files_all)
 
 	@echo "[TIDY] check files"
-	@$(LATEST_CLANG_TIDY) --fix --config-file=.clang-tidy $(files_all)
+	@$(LATEST_CLANG_TIDY) --config-file=.clang-tidy $(files_all)
 
 	@rm .clang-tidy
 
