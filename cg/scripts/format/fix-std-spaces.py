@@ -1,7 +1,7 @@
 import sys
 
-#argv[1] - --fix option
-#argv[2:] - files for fotmatting
+#argv[1]  --fix option
+#argv[2:] files for fotmatting
 
 def fix_std_spaces():
   files = sys.argv

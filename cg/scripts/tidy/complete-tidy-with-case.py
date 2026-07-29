@@ -1,11 +1,11 @@
 import sys
 from clang.cindex import Index, CursorKind
 
-#argv[1] - empty .clang-tidy file for write
-#argv[2] - general .clang-tidy file
-#argv[3] - camelBack case .clang-format file
-#argv[4] - lower_case case .clang-format file
-#argv[5:] - files for fotmatting
+#argv[1]  empty .clang-tidy file for write
+#argv[2]  general .clang-tidy file
+#argv[3]  camelBack case .clang-format file
+#argv[4]  lower_case case .clang-format file
+#argv[5:] files for fotmatting
 
 def find_variables_ast_case(filename) -> int:
   index = Index.create()
@@ -59,7 +59,7 @@ def add_need_case():
   tidy_write.write(tidy_case.read())
 
   tidy_write.write(tidy_general.read())
-  
+
   tidy_write.close()
   tidy_general.close()
   tidy_camel.close()

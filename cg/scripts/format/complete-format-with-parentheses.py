@@ -1,10 +1,10 @@
 import sys
 
-#argv[1] - empty .clang-format file for write
-#argv[2] - general .clang-format file
-#argv[3] - break parentheses .clang-format file
-#argv[4] - egypt parentheses .clang-format file
-#argv[5:] - files for fotmatting
+#argv[1]  empty .clang-format file for write
+#argv[2]  general .clang-format file
+#argv[3]  break parentheses .clang-format file
+#argv[4]  egypt parentheses .clang-format file
+#argv[5:] files for fotmatting
 
 def find_parentheses_style() -> int:
   files = sys.argv

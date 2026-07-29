@@ -1,7 +1,7 @@
 import sys
 
-#argv[1] - --check option
-#argv[2:] - files for fotmatting
+#argv[1]  --check option
+#argv[2:] files for fotmatting
 
 def check_comments():
   files = sys.argv

@@ -1,7 +1,7 @@
 import sys
 
-#argv[1] - --fix option
-#argv[2:] - files for fotmatting
+#argv[1]  --fix option
+#argv[2:] files for fotmatting
 
 def fix_comments():
   files = sys.argv
@@ -9,7 +9,7 @@ def fix_comments():
   for file_path in files[2:]:
     temp_file = []
     file = open(file_path, 'r+')
-    
+
     line = file.readline()
     while line:
       if not("//" in line or "/*" in line):
