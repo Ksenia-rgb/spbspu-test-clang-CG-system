@@ -3,6 +3,11 @@ name: Lab testing in pull requests
 on:
   pull_request:
   workflow_dispatch:
+    inputs:
+      run-optimal-cg:
+        description: 'Run optional cg check'
+        type: boolean
+        default: false
 
 env:
   BASE_BRANCH: origin/${{ github.event.pull_request.base.ref }}

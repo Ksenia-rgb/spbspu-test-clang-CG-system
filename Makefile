@@ -172,9 +172,9 @@ $(addprefix format-,$(labs)): format-%: check-clang-format
 
 	@if [ $(check) = 1 ]; then \
 	echo "[FORMAT] check files"; \
-		python3 ../scripts/format/check-comments.py "--check" $(files_all); \
-		python3 ../scripts/format/check-std-spaces.py "--check" $(files_all); \
-		python3 ../scripts/format/check-alias-length.py "--check" $(files_all); \
+		python3 cg/scripts/format/check-comments.py "--check" $(files_all); \
+		python3 cg/scripts/format/check-std-spaces.py "--check" $(files_all); \
+		python3 cg/scripts/format/check-alias-length.py "--check" $(files_all); \
 		$(LATEST_CLANG_FORMAT) -style=file:.clang-format -n $(files_all); \
 	fi
 	@if [ $(fix) = 1 ]; then \

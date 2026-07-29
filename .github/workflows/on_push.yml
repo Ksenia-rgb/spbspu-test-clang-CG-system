@@ -3,6 +3,11 @@ name: Lab testing on push
 on:
   push:
   workflow_dispatch:
+    inputs:
+      run-optimal-cg:
+        description: 'Run optional cg check'
+        type: boolean
+        default: false
 
 jobs:
   branch:
