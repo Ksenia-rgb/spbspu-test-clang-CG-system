@@ -73,7 +73,7 @@ def main():
   if len(sys.argv) <= 5:
     print(f'{RED}error:{RESET}', "no files for formatting")
     return 0
-  
+
   add_need_case()
   return
 
