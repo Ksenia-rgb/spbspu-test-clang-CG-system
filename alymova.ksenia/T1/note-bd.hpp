@@ -1,5 +1,9 @@
 #ifndef NOTE_BD_HPP
 #define NOTE_BD_HPP
+#include <string>
+#include <ostream>
+#include <map>
+#include <memory>
 #include "note.hpp"
 
 namespace alymova

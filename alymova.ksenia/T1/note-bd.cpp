@@ -1,6 +1,10 @@
 #include "note-bd.hpp"
+#include <exception>
 #include <iostream>
 #include <cassert>
+#include <string>
+#include <memory>
+#include <stdexcept>
 
 alymova::NoteBd::NoteBd():
   bd_()

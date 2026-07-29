@@ -1,6 +1,10 @@
 #include "note.hpp"
+#include <cstddef>
 #include <iostream>
-#include <algorithm>
+#include <string>
+#include <memory>
+#include <stdexcept>
+#include <vector>
 
 alymova::Note::Note(const std::string& name):
   name_(name),
@@ -38,21 +42,21 @@ void alymova::Note::mind(std::ostream& out) const
     ++iter;
   }
   if (iter != refs_.end()) {
-    std::shared_ptr< Note > shared(*iter);
+    const std::shared_ptr< Note > shared(*iter);
     out << shared->name_;
   } else {
     return;
   }
   for (++iter; iter != refs_.end(); ++iter) {
     if (!iter->expired()) {
-      std::shared_ptr< Note > shared(*iter);
+      const std::shared_ptr< Note > shared(*iter);
       out << '\n' << shared->name_;
     }
   }
 }
 void alymova::Note::halt(const std::shared_ptr< Note > note_to)
 {
-  std::vector< std::weak_ptr< Note > >::const_iterator iter = findNote(note_to->name_);
+  const std::vector< std::weak_ptr< Note > >::const_iterator iter = findNote(note_to->name_);
   if (iter == refs_.end()) {
     throw std::logic_error("<HALT> not existed note");
   }
@@ -83,7 +87,7 @@ std::vector< std::weak_ptr< alymova::Note > >::const_iterator alymova::Note::fin
 {
   for (auto iter = refs_.begin(); iter != refs_.end(); ++iter) {
     if (!iter->expired()) {
-      std::shared_ptr< Note > shared(*iter);
+      const std::shared_ptr< Note > shared(*iter);
       if (shared->name_ == name) {
         return iter;
       }

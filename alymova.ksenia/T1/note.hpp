@@ -1,6 +1,6 @@
 #ifndef NOTE_HPP
 #define NOTE_HPP
-#include <map>
+#include <ostream>
 #include <vector>
 #include <string>
 #include <memory>
@@ -13,9 +13,9 @@ namespace alymova
     Note(const std::string& name);
     void addLine(const std::string& line);
     void show(std::ostream& out) const;
-    void addLink(const std::shared_ptr< Note > note_to);
+    void addLink(std::shared_ptr< Note > note_to);
     void mind(std::ostream& out) const;
-    void halt(const std::shared_ptr< Note > note_to);
+    void halt(std::shared_ptr< Note > note_to);
     void expired(std::ostream& out) const;
     void refresh();
   private:

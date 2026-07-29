@@ -1,8 +1,11 @@
+#include <exception>
 #include <iostream>
 #include <map>
 #include <functional>
 #include <limits>
+#include <string>
 #include "note-bd-commands.hpp"
+#include "note-bd.hpp"
 
 int main() {
   using namespace alymova;

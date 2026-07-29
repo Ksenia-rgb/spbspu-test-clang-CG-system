@@ -1,5 +1,7 @@
-#ifndef NOTE_BD_IMPL_HPP
-#define NOTE_BD_IMPL_HPP
+#ifndef NOTE_BD_COMMANDS_HPP
+#define NOTE_BD_COMMANDS_HPP
+#include <istream>
+#include <ostream>
 #include "note-bd.hpp"
 
 namespace alymova
