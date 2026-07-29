@@ -10,9 +10,9 @@ from clang.cindex import Index, CursorKind
 def find_variables_ast_case(filename) -> int:
   index = Index.create()
   translation_unit = index.parse(filename)
-  
+
   case = 0
-  
+
   def visit_node(node):
     nonlocal case
 
@@ -24,10 +24,10 @@ def find_variables_ast_case(filename) -> int:
           case -= 1
         elif name.lower() != name and "_" not in name:
           case += 1
-    
+
     for child in node.get_children():
       visit_node(child)
-  
+
   visit_node(translation_unit.cursor)
   return case
 
@@ -43,7 +43,7 @@ def add_need_case():
     tidy_write.write(line)
     line = tidy_general.readline()
   tidy_write.write(line)
-  
+
   case = 0
   for file in files[5:]:
     case += find_variables_ast_case(file)

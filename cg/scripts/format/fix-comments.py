@@ -5,7 +5,7 @@ import sys
 
 def fix_comments():
   files = sys.argv
-  
+
   for file_path in files[2:]:
     temp_file = []
     file = open(file_path, 'r+')
@@ -37,7 +37,7 @@ def main():
   if files[1] != "--fix":
     print(f'{RED}error:{RESET}', "incorrect option")
     return
-  
+
   fix_comments()
   return
 

@@ -35,8 +35,8 @@ def add_need_style():
     format_write.write(line)
     line = format_general.readline()
   format_write.write(line)
-  
-  
+
+
   indent = find_parentheses_style()
   if indent >= 0:
     format_parentheses = format_break
@@ -49,7 +49,7 @@ def add_need_style():
   format_write.write(format_parentheses.read())
 
   format_write.write(format_general.read())
-  
+
   format_write.close()
   format_general.close()
   format_break.close()
@@ -63,7 +63,7 @@ def main():
   if len(sys.argv) <= 5:
     print(f'{RED}error:{RESET}', "no files for formatting")
     return 0
-  
+
   add_need_style()
   return
 

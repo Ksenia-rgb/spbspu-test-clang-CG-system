@@ -5,7 +5,7 @@ import sys
 
 def check_comments():
   files = sys.argv
-  
+
   for file_path in files[2:]:
     str_count = 1
     file = open(file_path, 'r')
@@ -39,7 +39,7 @@ def main():
   if files[1] != "--check":
     print(f'{RED}error:{RESET}', "incorrect option")
     return
-  
+
   check_comments()
   return
 

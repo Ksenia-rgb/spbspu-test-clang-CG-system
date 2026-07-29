@@ -5,7 +5,7 @@ import sys
 
 def check_std_spaces():
   files = sys.argv
-  
+
   for file_path in files[2:]:
     str_count = 1
     file = open(file_path, 'r')
@@ -27,7 +27,7 @@ def print_warning(file_path, str_count):
   print(f'{BOLD}{file_path}:{str(str_count)}:{RESET}', f'{PURPLE}warning:{RESET}',
         f'{BOLD}extra whitespace after std{RESET}')
   return
-  
+
 def main():
   RED = '\033[1;31m'
   RESET = '\033[0m'
@@ -39,7 +39,7 @@ def main():
   if files[1] != "--check":
     print(f'{RED}error:{RESET}', "incorrect option")
     return
-  
+
   check_std_spaces()
   return
 
