@@ -63,7 +63,9 @@ def main():
     print(f'{RED}error:{RESET}', "no files for formatting")
     return 0
   if files[1] == "--check":
-    return check_comments()
+    if check_comments():
+      sys.exit(1)
+    return 0
   elif files[1] == "--fix":
     fix_comments()
     return 0

@@ -58,7 +58,9 @@ def main():
     print(f'{RED}error:{RESET}', "no files for formatting")
     return 0
   if files[1] == "--check":
-    return check_std_spaces()
+    if check_std_spaces():
+      sys.exit(1)
+    return 0
   elif files[1] == "--fix":
     fix_std_spaces()
     return 0
