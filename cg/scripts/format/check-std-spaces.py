@@ -1,6 +1,6 @@
 import sys
 
-#argv[1]  --check option
+#argv[1]  --check / --fix option
 #argv[2:] files for fotmatting
 
 def check_std_spaces():
