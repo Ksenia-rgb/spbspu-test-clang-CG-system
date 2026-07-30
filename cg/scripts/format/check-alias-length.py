@@ -4,6 +4,8 @@ import sys
 #argv[2:] files for fotmatting
 
 def check_alias_length():
+  return_code = 0
+
   files = sys.argv
 
   for file_path in files[2:]:
@@ -15,17 +17,19 @@ def check_alias_length():
         words = line.split()
         alias = words[2][:-1]
         if len(alias) < 3:
+          return_code = 1
           print_warning(file_path, str_count)
       if "using" in line:
         words = line.split()
         alias = words[1]
         if len(alias) < 3:
+          return_code = 1
           print_warning(file_path, str_count)
 
       line = file.readline()
       str_count += 1
     file.close()
-  return
+  return return_code
 
 def print_warning(file_path, str_count):
   PURPLE = '\033[1;35m'
@@ -43,13 +47,12 @@ def main():
   files = sys.argv
   if len(files) <= 2:
     print(f'{RED}error:{RESET}', "no files for formatting")
-    return
+    return 0
   if files[1] != "--check":
     print(f'{RED}error:{RESET}', "incorrect option")
-    return
-
-  check_alias_length()
-  return
+    return 1
+  
+  return check_alias_length()
 
 if __name__ == "__main__":
   main()

@@ -4,6 +4,8 @@ import sys
 #argv[2:] files for fotmatting
 
 def check_std_spaces():
+  return_code = 0
+
   files = sys.argv
 
   for file_path in files[2:]:
@@ -12,10 +14,29 @@ def check_std_spaces():
     line = file.readline()
     while line:
       if "std ::" in line:
+        return_code = 1
         print_warning(file_path, str_count)
 
       line = file.readline()
       str_count += 1
+    file.close()
+  return return_code
+
+def fix_std_spaces():
+  files = sys.argv
+
+  for file_path in files[2:]:
+    temp_file = []
+    file = open(file_path, 'r+')
+    line = file.readline()
+    while line:
+      if "std ::" in line:
+        line = line.replace("std ::", "std::")
+      temp_file.append(line)
+      line = file.readline()
+    file.seek(0)
+    file.truncate()
+    file.writelines(temp_file)
     file.close()
   return
 
@@ -35,13 +56,15 @@ def main():
   files = sys.argv
   if len(files) <= 2:
     print(f'{RED}error:{RESET}', "no files for formatting")
-    return
-  if files[1] != "--check":
+    return 0
+  if files[1] == "--check":
+    return check_std_spaces()
+  elif files[1] == "--fix":
+    fix_std_spaces()
+    return 0
+  else:
     print(f'{RED}error:{RESET}', "incorrect option")
-    return
-
-  check_std_spaces()
-  return
+    return 0
 
 if __name__ == "__main__":
   main()

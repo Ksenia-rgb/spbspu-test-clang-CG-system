@@ -1,9 +1,11 @@
 import sys
 
-#argv[1]  --check option
+#argv[1]  --check / --fix option
 #argv[2:] files for fotmatting
 
 def check_comments():
+  return_code = 0
+
   files = sys.argv
 
   for file_path in files[2:]:
@@ -12,10 +14,34 @@ def check_comments():
     line = file.readline()
     while line:
       if "//" in line or "/*" in line:
+        return_code = 1
         print_warning(file_path, str_count)
 
       line = file.readline()
       str_count += 1
+    file.close()
+  return return_code
+
+def fix_comments():
+  files = sys.argv
+
+  for file_path in files[2:]:
+    temp_file = []
+    file = open(file_path, 'r+')
+
+    line = file.readline()
+    while line:
+      if not("//" in line or "/*" in line):
+        temp_file.append(line)
+
+      if "/*" in line:
+        while line and not("*/" in line):
+          line = file.readline()
+
+      line = file.readline()
+    file.seek(0)
+    file.truncate()
+    file.writelines(temp_file)
     file.close()
   return
 
@@ -35,13 +61,15 @@ def main():
   files = sys.argv
   if len(files) <= 2:
     print(f'{RED}error:{RESET}', "no files for formatting")
-    return
-  if files[1] != "--check":
+    return 0
+  if files[1] == "--check":
+    return check_comments()
+  elif files[1] == "--fix":
+    fix_comments()
+    return 0
+  else:
     print(f'{RED}error:{RESET}', "incorrect option")
-    return
-
-  check_comments()
-  return
+    return 1
 
 if __name__ == "__main__":
   main()
