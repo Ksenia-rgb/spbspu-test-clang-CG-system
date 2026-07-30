@@ -5,9 +5,9 @@ on:
   workflow_dispatch:
     inputs:
       run-optimal-cg:
-        description: 'Run optional cg check'
         type: boolean
         default: false
+        description: 'Run optional cg check'
 
 jobs:
   branch:
