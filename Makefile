@@ -234,7 +234,7 @@ $(addprefix tidy-,$(labs)): tidy-%: check-clang-tidy
 		$(tidy_write) $(tidy_general) $(tidy_camel) $(tidy_lower) $(files_all)
 
 	@echo "[TIDY] check files"
-	@$(LATEST_CLANG_TIDY) --config-file=.clang-tidy -header-filter='.*' --quiet $(files_all)
+	@$(LATEST_CLANG_TIDY) --config-file=.clang-tidy -header-filter='.*' --warnings-as-errors='*' --quiet $(files_all)
 
 	@rm .clang-tidy
 
