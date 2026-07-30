@@ -5,7 +5,7 @@
 .SECONDARY:
 
 BOOST_LOCATION := $(shell test -f .boost_location && cat .boost_location ; true)
-DOCKER_IMAGE ?= volgarenok/cxx-test:latest
+DOCKER_IMAGE ?= caseyrgb/apline-cxx:latest
 
 ifneq 'yes' '$(VERBOSE)'
 hidecmd := @
@@ -131,6 +131,19 @@ $(addprefix doctest-,$(labs)): doctest-%: check-docker
 			'/spbspu-labs-tests/report-md.xslt' \
 			'out/$(student)/$(lab)/acceptance.xml' && \
 			cat out/$(student)/$(lab)/acceptance.md"
+
+	@rm -f vgcore.*
+
+$(addprefix doclint-,$(labs)): doclint-%: check-docker
+	@docker run --rm \
+		-v $(PWD):/workspace \
+		-w /workspace \
+		-e BASE_BRANCH=origin/master \
+		$(DOCKER_IMAGE) \
+		/bin/bash -c "\
+			cd /workspace && \
+			echo '=== CG ===' && \
+			/spbspu-labs-tests/validate-cg.sh"
 
 	@rm -f vgcore.*
 
