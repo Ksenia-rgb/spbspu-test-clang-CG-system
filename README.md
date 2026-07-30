@@ -15,9 +15,9 @@ VS Code имеет встроенную поддержку clang-format, по у
 
 ## Новые цели:
 
-- `format-labid`: форматирование лабораторной программы с помощью clang-format, например
+1. `format-labid`: форматирование лабораторной программы с помощью clang-format, например
 ```
-make format-alymova.ksenia/F0
+make format-alymova.ksenia/T1
 ```
 Дополнительные параметры:
 
@@ -29,21 +29,26 @@ make format-alymova.ksenia/F0
 
 Для передачи дополнительных параметров используется переменная ARGS (при помощи GNU Make):
 ```
-$ make format-alymova.ksenia/F0 ARGS="--check --fix"
+$ make format-alymova.ksenia/T1 ARGS="--fix"
 ```
 или (с использоваием Bourne Shell):
 ```
-$ ARGS="--check --fix" make format-alymova.ksenia/F0
+$ ARGS="--check" make format-alymova.ksenia/T1
 ```
 или (Bourne Shell, с сохранением в окржении процесса):
 ```
 $ export ARGS="--check --fix"
-$ make alymova.ksenia/F0
+$ make alymova.ksenia/T1
 ```
 
-- `tidy-labid`: статический анализ кода с помощью clang-tidy, например
+2. `tidy-labid`: статический анализ кода с помощью clang-tidy, например
 ```
-make tidy-alymova.ksenia/F0
+make tidy-alymova.ksenia/T1
+```
+
+3. `doclint-labid`: запуск этапа `cg` из Github Actions Workflow локально в докер-контейнере
+```
+make doclint-alymova.ksenia/T1
 ```
 ## Требуемые средства (для локального запуска)
 - clang-format версии >= 20
