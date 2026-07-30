@@ -45,7 +45,7 @@ $ make alymova.ksenia/F0
 ```
 make tidy-alymova.ksenia/F0
 ```
-## Требуемые средства (для запуска не в Docker)
+## Требуемые средства (для локального запуска)
 - clang-format версии >= 20
 - clang-tidy версии >= 20
 - python3

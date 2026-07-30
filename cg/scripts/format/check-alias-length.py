@@ -51,8 +51,10 @@ def main():
   if files[1] != "--check":
     print(f'{RED}error:{RESET}', "incorrect option")
     return 1
-  
-  return check_alias_length()
+
+  if check_alias_length():
+    sys.exit(1)
+  return 0
 
 if __name__ == "__main__":
   main()
