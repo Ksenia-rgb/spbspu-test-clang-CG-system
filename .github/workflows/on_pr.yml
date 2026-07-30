@@ -10,8 +10,8 @@ on:
           - skip
           - free
           - affect
-        default: free
-        description: 'Run optional cg check as result affecting'
+        default: 'free'
+        description: 'Skip optional cg check, run and not affect the result, run and affect the result'
 
 env:
   BASE_BRANCH: origin/${{ github.event.pull_request.base.ref }}

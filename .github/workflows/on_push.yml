@@ -4,10 +4,14 @@ on:
   push:
   workflow_dispatch:
     inputs:
-      run-optimal-cg:
-        type: boolean
-        default: false
-        description: 'Run optional cg check'
+      run-optional-cg:
+        type: choice
+        options:
+          - skip
+          - free
+          - affect
+        default: 'free'
+        description: 'Skip optional cg check, run and not affect the result, run and affect the result'
 
 jobs:
   branch:
@@ -78,10 +82,11 @@ jobs:
           overwrite: true
   cg:
     needs: [build]
-    continue-on-error: true
+    continue-on-error: ${{ inputs.run-optional-cg == 'free' }}
     runs-on: ubuntu-latest
     container:
       image: caseyrgb/apline-cxx:latest
+    if: ${{ inputs.run-optional-cg != 'skip' }}
     steps:
       - uses: actions/checkout@v3
       - name: CG
