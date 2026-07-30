@@ -188,8 +188,8 @@ $(addprefix format-,$(labs)): format-%: check-clang-format
 	fi
 	@if [ $(fix) = 1 ]; then \
 		echo "[FORMAT] fix files"; \
-		python3 cg/scripts/format/fix-comments.py "--fix" $(files_all); \
-		python3 cg/scripts/format/fix-std-spaces.py "--fix" $(files_all); \
+		python3 cg/scripts/format/check-comments.py "--fix" $(files_all); \
+		python3 cg/scripts/format/check-std-spaces.py "--fix" $(files_all); \
 		$(LATEST_CLANG_FORMAT) -style=file:.clang-format -i $(files_all); \
 	fi
 
@@ -234,7 +234,7 @@ $(addprefix tidy-,$(labs)): tidy-%: check-clang-tidy
 		$(tidy_write) $(tidy_general) $(tidy_camel) $(tidy_lower) $(files_all)
 
 	@echo "[TIDY] check files"
-	@$(LATEST_CLANG_TIDY) --config-file=.clang-tidy $(files_all)
+	@$(LATEST_CLANG_TIDY) --config-file=.clang-tidy -header-filter='.*' --quiet $(files_all)
 
 	@rm .clang-tidy
 
