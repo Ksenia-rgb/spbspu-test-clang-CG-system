@@ -14,4 +14,4 @@ out
 # Helpers
 update-student-stats.sh
 generate-stats
-cg/linters/format/.useless-old
+.github/cg/linters/format/.useless-old

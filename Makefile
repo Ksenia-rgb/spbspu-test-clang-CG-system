@@ -168,9 +168,9 @@ check-clang-format:
 $(addprefix format-,$(labs)): format-%: check-clang-format
 	$(eval check := $(if $(filter --check,$(ARGS)),1,$(if $(ARGS),0,1)))
 	$(eval fix := $(if $(filter --fix,$(ARGS)),1,0))
-	$(eval format_general := cg/linters/format/.clang-format)
-	$(eval format_break := cg/linters/format/format-break/.clang-format)
-	$(eval format_egypt := cg/linters/format/format-egypt/.clang-format)
+	$(eval format_general := .github/cg/linters/format/.clang-format)
+	$(eval format_break := .github/cg/linters/format/format-break/.clang-format)
+	$(eval format_egypt := .github/cg/linters/format/format-egypt/.clang-format)
 	$(eval format_write := ./.clang-format)
 
 	@if [ $(check) = 0 ] && [ $(fix) = 0 ]; then \
@@ -189,20 +189,20 @@ $(addprefix format-,$(labs)): format-%: check-clang-format
 
 	@touch .clang-format
 	
-	@python3 cg/scripts/format/complete-format-with-parentheses.py \
+	@python3 .github/cg/scripts/format/complete-format-with-parentheses.py \
 		$(format_write) $(format_general) $(format_break) $(format_egypt) $(files_all)
 
 	@if [ $(check) = 1 ]; then \
 	echo "[FORMAT] check files"; \
-		python3 cg/scripts/format/check-comments.py "--check" $(files_all); \
-		python3 cg/scripts/format/check-std-spaces.py "--check" $(files_all); \
-		python3 cg/scripts/format/check-alias-length.py "--check" $(files_all); \
+		python3 .github/cg/scripts/format/check-comments.py "--check" $(files_all); \
+		python3 .github/cg/scripts/format/check-std-spaces.py "--check" $(files_all); \
+		python3 .github/cg/scripts/format/check-alias-length.py "--check" $(files_all); \
 		$(LATEST_CLANG_FORMAT) -style=file:.clang-format -n $(files_all); \
 	fi
 	@if [ $(fix) = 1 ]; then \
 		echo "[FORMAT] fix files"; \
-		python3 cg/scripts/format/check-comments.py "--fix" $(files_all); \
-		python3 cg/scripts/format/check-std-spaces.py "--fix" $(files_all); \
+		python3 .github/cg/scripts/format/check-comments.py "--fix" $(files_all); \
+		python3 .github/cg/scripts/format/check-std-spaces.py "--fix" $(files_all); \
 		$(LATEST_CLANG_FORMAT) -style=file:.clang-format -i $(files_all); \
 	fi
 
@@ -227,9 +227,9 @@ check-clang-tidy:
 	fi
 
 $(addprefix tidy-,$(labs)): tidy-%: check-clang-tidy
-	$(eval tidy_general := cg/linters/tidy/.clang-tidy)
-	$(eval tidy_camel := cg/linters/tidy/tidy-camel/.clang-tidy)
-	$(eval tidy_lower := cg/linters/tidy/tidy-lower/.clang-tidy)
+	$(eval tidy_general := .github/cg/linters/tidy/.clang-tidy)
+	$(eval tidy_camel := .github/cg/linters/tidy/tidy-camel/.clang-tidy)
+	$(eval tidy_lower := .github/cg/linters/tidy/tidy-lower/.clang-tidy)
 	$(eval tidy_write := ./.clang-tidy)
 
 	$(eval files_sources := $(call lab_sources,$*))
@@ -243,7 +243,7 @@ $(addprefix tidy-,$(labs)): tidy-%: check-clang-tidy
 
 	@touch .clang-tidy
 
-	@python3 cg/scripts/tidy/complete-tidy-with-case.py \
+	@python3 .github/cg/scripts/tidy/complete-tidy-with-case.py \
 		$(tidy_write) $(tidy_general) $(tidy_camel) $(tidy_lower) $(files_all)
 
 	@echo "[TIDY] check files"
