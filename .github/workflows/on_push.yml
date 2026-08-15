@@ -17,7 +17,7 @@ jobs:
   branch:
     runs-on: ubuntu-latest
     container:
-      image: caseyrgb/apline-cxx:latest
+      image: caseyrgb/rgb-tested:clang20
     steps:
       - uses: actions/checkout@v3
       - name: Branch
