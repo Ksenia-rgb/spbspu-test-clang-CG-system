@@ -175,7 +175,6 @@ $(addprefix format-,$(labs)): format-%: check-clang-format
 
 	@if [ $(check) = 0 ] && [ $(fix) = 0 ]; then \
 		python3 .github/cg/scripts/info.py \
-		exit 0; \
 	fi
 
 	$(eval files_sources := $(call lab_sources,$*))
@@ -187,10 +186,11 @@ $(addprefix format-,$(labs)): format-%: check-clang-format
 	$(eval files_all := $(files_sources) $(files_headers) $(files_tests) \
 		$(files_common_sources) $(files_common_headers) $(files_common_tests))
 
-	@touch .clang-format
-	
-	@python3 .github/cg/scripts/format/complete-format-with-parentheses.py \
-		$(format_write) $(format_general) $(format_break) $(format_egypt) $(files_all)
+	@if [ $(check) = 1 ] || [ $(fix) = 1 ]; then \
+		touch .clang-format \
+		python3 .github/cg/scripts/format/complete-format-with-parentheses.py \
+		$(format_write) $(format_general) $(format_break) $(format_egypt) $(files_all) \
+	fi
 
 	@if [ $(check) = 1 ]; then \
 		echo "[FORMAT] check files"; \
@@ -233,6 +233,10 @@ $(addprefix tidy-,$(labs)): tidy-%: check-clang-tidy
 	$(eval tidy_lower := .github/cg/linters/tidy/tidy-lower/.clang-tidy)
 	$(eval tidy_write := ./.clang-tidy)
 
+	@if [ $(check) = 0 ]; then \
+		python3 .github/cg/scripts/info.py \
+	fi
+
 	$(eval files_sources := $(call lab_sources,$*))
 	$(eval files_headers := $(call lab_headers,$*))
 	$(eval files_tests := $(call lab_test_sources,$*))
@@ -242,18 +246,13 @@ $(addprefix tidy-,$(labs)): tidy-%: check-clang-tidy
 	$(eval files_all := $(files_sources) $(files_headers) $(files_tests) \
 		$(files_common_sources) $(files_common_headers) $(files_common_tests))
 
-	@if [ $(check) = 0 ]; then \
-		python3 .github/cg/scripts/info.py \
-		exit 0; \
+	@if [ $(check) = 1 ]; then \
+		touch .clang-tidy; \
+		python3 .github/cg/scripts/tidy/complete-tidy-with-case.py \
+			$(tidy_write) $(tidy_general) $(tidy_camel) $(tidy_lower) $(files_all); \
+		echo "[TIDY] check files"; \
+		$(LATEST_CLANG_TIDY) --config-file=.clang-tidy -header-filter='.*' --warnings-as-errors='*' --quiet $(files_all)\
 	fi
-
-	@touch .clang-tidy
-
-	@python3 .github/cg/scripts/tidy/complete-tidy-with-case.py \
-		$(tidy_write) $(tidy_general) $(tidy_camel) $(tidy_lower) $(files_all)
-
-	@echo "[TIDY] check files"
-	@$(LATEST_CLANG_TIDY) --config-file=.clang-tidy -header-filter='.*' --warnings-as-errors='*' --quiet $(files_all)
 
 	@rm .clang-tidy
 
