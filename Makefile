@@ -174,7 +174,7 @@ $(addprefix format-,$(labs)): format-%: check-clang-format
 	$(eval format_write := ./.clang-format)
 
 	@if [ $(check) = 0 ] && [ $(fix) = 0 ]; then \
-		@python3 .github/cg/scripts/info.py \
+		python3 .github/cg/scripts/info.py \
 		exit 0; \
 	fi
 
@@ -193,7 +193,7 @@ $(addprefix format-,$(labs)): format-%: check-clang-format
 		$(format_write) $(format_general) $(format_break) $(format_egypt) $(files_all)
 
 	@if [ $(check) = 1 ]; then \
-	echo "[FORMAT] check files"; \
+		echo "[FORMAT] check files"; \
 		python3 .github/cg/scripts/format/check-comments.py "--check" $(files_all); \
 		python3 .github/cg/scripts/format/check-std-spaces.py "--check" $(files_all); \
 		python3 .github/cg/scripts/format/check-alias-length.py "--check" $(files_all); \
@@ -243,7 +243,7 @@ $(addprefix tidy-,$(labs)): tidy-%: check-clang-tidy
 		$(files_common_sources) $(files_common_headers) $(files_common_tests))
 
 	@if [ $(check) = 0 ]; then \
-		@python3 .github/cg/scripts/info.py \
+		python3 .github/cg/scripts/info.py \
 		exit 0; \
 	fi
 
