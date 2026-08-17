@@ -23,9 +23,24 @@ make format-alymova.ksenia/T1
 
 `--check`: отображение частей кода, отформатированных не по CG,
 
-`--fix`: исправление кода, в соответствии с CG.
+`--fix`: исправление кода, в соответствии с CG,
 
-Параметры могут использованы отдельно или вместе. По умолчанию (без передачи параметров) выполняется режим check.
+`--info`: вывод вспомогательной информации о доступных параметрах, работе с пунктами CG
+
+По умолчанию (без передачи параметров) выполняется режим check.
+
+2. `tidy-labid`: статический анализ кода с помощью clang-tidy, например
+```
+make tidy-alymova.ksenia/T1
+```
+Дополнительные параметры:
+
+`--check`: отображение частей кода, отформатированных не по CG,
+
+`--info`: вывод вспомогательной информации о доступных параметрах, работе с пунктами CG.
+
+По умолчанию (без передачи параметров) выполняется режим check.
+
 
 Для передачи дополнительных параметров используется переменная ARGS (при помощи GNU Make):
 ```
@@ -33,17 +48,12 @@ $ make format-alymova.ksenia/T1 ARGS="--fix"
 ```
 или (с использоваием Bourne Shell):
 ```
-$ ARGS="--check" make format-alymova.ksenia/T1
+$ ARGS="--check" make tidy-alymova.ksenia/T1
 ```
-или (Bourne Shell, с сохранением в окржении процесса):
+или (Bourne Shell, с сохранением в окрeжении процесса):
 ```
-$ export ARGS="--check --fix"
-$ make alymova.ksenia/T1
-```
-
-2. `tidy-labid`: статический анализ кода с помощью clang-tidy, например
-```
-make tidy-alymova.ksenia/T1
+$ export ARGS="--info"
+$ make format-alymova.ksenia/T1
 ```
 
 3. `doclint-labid`: запуск этапа `cg` из Github Actions Workflow локально в докер-контейнере
@@ -54,4 +64,3 @@ make doclint-alymova.ksenia/T1
 - clang-format версии >= 20
 - clang-tidy версии >= 20
 - python3
-

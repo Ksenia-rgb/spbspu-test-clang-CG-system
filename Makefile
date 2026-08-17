@@ -5,7 +5,7 @@
 .SECONDARY:
 
 BOOST_LOCATION := $(shell test -f .boost_location && cat .boost_location ; true)
-DOCKER_IMAGE ?= caseyrgb/apline-cxx:latest
+DOCKER_IMAGE ?= caseyrgb/rgb-tested:clang20
 
 ifneq 'yes' '$(VERBOSE)'
 hidecmd := @
@@ -174,8 +174,8 @@ $(addprefix format-,$(labs)): format-%: check-clang-format
 	$(eval format_write := ./.clang-format)
 
 	@if [ $(check) = 0 ] && [ $(fix) = 0 ]; then \
-		echo "[FORMAT] Incorrect command args"; \
-		exit 1; \
+		@python3 .github/cg/scripts/info.py \
+		exit 0; \
 	fi
 
 	$(eval files_sources := $(call lab_sources,$*))
@@ -227,6 +227,7 @@ check-clang-tidy:
 	fi
 
 $(addprefix tidy-,$(labs)): tidy-%: check-clang-tidy
+	$(eval check := $(if $(filter --check,$(ARGS)),1,$(if $(ARGS),0,1)))
 	$(eval tidy_general := .github/cg/linters/tidy/.clang-tidy)
 	$(eval tidy_camel := .github/cg/linters/tidy/tidy-camel/.clang-tidy)
 	$(eval tidy_lower := .github/cg/linters/tidy/tidy-lower/.clang-tidy)
@@ -240,6 +241,11 @@ $(addprefix tidy-,$(labs)): tidy-%: check-clang-tidy
 	$(eval files_common_tests := $(call lab_common_tests,$(call student,$*)))
 	$(eval files_all := $(files_sources) $(files_headers) $(files_tests) \
 		$(files_common_sources) $(files_common_headers) $(files_common_tests))
+
+	@if [ $(check) = 0 ]; then \
+		@python3 .github/cg/scripts/info.py \
+		exit 0; \
+	fi
 
 	@touch .clang-tidy
 
