@@ -1,6 +1,5 @@
 def print_info():
-  info = '''
-Three options are available for the target `format-<labid>`:
+  info = '''Three options are available for the target `format-<labid>`:
   --check
   --fix
   --info
@@ -26,8 +25,7 @@ Remember: automatic checks should help you format your code,
 but they shouldn’t completely relieve you of this responsibility.
 A lot of details and conventions still fall on your shoulders.
 Check your code and monitor the automatic checks you use.
-And may the odds be ever in your favor!
-'''
+And may the odds be ever in your favor!'''
   print(info)
   return
 

@@ -174,7 +174,7 @@ $(addprefix format-,$(labs)): format-%: check-clang-format
 	$(eval format_write := ./.clang-format)
 
 	@if [ $(check) = 0 ] && [ $(fix) = 0 ]; then \
-		python3 .github/cg/scripts/info.py \
+		python3 .github/cg/scripts/info.py; \
 	fi
 
 	$(eval files_sources := $(call lab_sources,$*))
@@ -187,9 +187,9 @@ $(addprefix format-,$(labs)): format-%: check-clang-format
 		$(files_common_sources) $(files_common_headers) $(files_common_tests))
 
 	@if [ $(check) = 1 ] || [ $(fix) = 1 ]; then \
-		touch .clang-format \
+		touch .clang-format; \
 		python3 .github/cg/scripts/format/complete-format-with-parentheses.py \
-		$(format_write) $(format_general) $(format_break) $(format_egypt) $(files_all) \
+			$(format_write) $(format_general) $(format_break) $(format_egypt) $(files_all); \
 	fi
 
 	@if [ $(check) = 1 ]; then \
@@ -206,7 +206,7 @@ $(addprefix format-,$(labs)): format-%: check-clang-format
 		$(LATEST_CLANG_FORMAT) -style=file:.clang-format -i $(files_all); \
 	fi
 
-	@rm .clang-format
+	@rm -f .clang-format
 
 check-clang-tidy:
 	$(eval LATEST_CLANG_TIDY := $(shell \
@@ -234,7 +234,7 @@ $(addprefix tidy-,$(labs)): tidy-%: check-clang-tidy
 	$(eval tidy_write := ./.clang-tidy)
 
 	@if [ $(check) = 0 ]; then \
-		python3 .github/cg/scripts/info.py \
+		python3 .github/cg/scripts/info.py; \
 	fi
 
 	$(eval files_sources := $(call lab_sources,$*))
@@ -251,9 +251,9 @@ $(addprefix tidy-,$(labs)): tidy-%: check-clang-tidy
 		python3 .github/cg/scripts/tidy/complete-tidy-with-case.py \
 			$(tidy_write) $(tidy_general) $(tidy_camel) $(tidy_lower) $(files_all); \
 		echo "[TIDY] check files"; \
-		$(LATEST_CLANG_TIDY) --config-file=.clang-tidy -header-filter='.*' --warnings-as-errors='*' --quiet $(files_all)\
+		$(LATEST_CLANG_TIDY) --config-file=.clang-tidy -header-filter='.*' --warnings-as-errors='*' --quiet $(files_all); \
 	fi
 
-	@rm .clang-tidy
+	@rm -f .clang-tidy;
 
 include $(wildcard $(patsubst %.o,%.d,$(objects) $(test_objects)))
