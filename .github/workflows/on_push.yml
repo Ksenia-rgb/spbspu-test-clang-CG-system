@@ -2,6 +2,7 @@ name: Lab testing
 
 on:
   push:
+  pull_request:
   workflow_dispatch:
     inputs:
       run-optional-cg:
@@ -23,7 +24,7 @@ jobs:
       - name: Set base branch for pr
         if: github.event_name == 'pull_request'
         run: |
-          echo "BASE_BRANCH=origin/${{ github.base_ref }}" >> $GITHUB_ENV
+          echo "BASE_BRANCH=origin/${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
       - name: Branch
         working-directory: ${{ github.workspace }}
         run: $TEST_DIR/validate-branch.sh
@@ -37,7 +38,7 @@ jobs:
       - name: Set base branch for pr
         if: github.event_name == 'pull_request'
         run: |
-          echo "BASE_BRANCH=origin/${{ github.base_ref }}" >> $GITHUB_ENV
+          echo "BASE_BRANCH=origin/${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
       - name: Content
         working-directory: ${{ github.workspace }}
         run: $TEST_DIR/validate-files.sh
@@ -51,7 +52,7 @@ jobs:
       - name: Set base branch for pr
         if: github.event_name == 'pull_request'
         run: |
-          echo "BASE_BRANCH=origin/${{ github.base_ref }}" >> $GITHUB_ENV
+          echo "BASE_BRANCH=origin/${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
       - name: Author
         working-directory: ${{ github.workspace }}
         run: $TEST_DIR/validate-student.sh
@@ -66,7 +67,7 @@ jobs:
       - name: Set base branch for pr
         if: github.event_name == 'pull_request'
         run: |
-          echo "BASE_BRANCH=origin/${{ github.base_ref }}" >> $GITHUB_ENV
+          echo "BASE_BRANCH=origin/${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
       - name: Build
         working-directory: ${{ github.workspace }}
         run: $TEST_DIR/build.sh
@@ -87,7 +88,7 @@ jobs:
       - name: Set base branch for pr
         if: github.event_name == 'pull_request'
         run: |
-          echo "BASE_BRANCH=origin/${{ github.base_ref }}" >> $GITHUB_ENV
+          echo "BASE_BRANCH=origin/${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
       - name: Acceptance
         working-directory: ${{ github.workspace }}
         run: |
@@ -112,7 +113,7 @@ jobs:
       - name: Set base branch for pr
         if: github.event_name == 'pull_request'
         run: |
-          echo "BASE_BRANCH=origin/${{ github.base_ref }}" >> $GITHUB_ENV
+          echo "BASE_BRANCH=origin/${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
       - name: CG
         working-directory: ${{ github.workspace }}
         run: $TEST_DIR/validate-cg.sh
