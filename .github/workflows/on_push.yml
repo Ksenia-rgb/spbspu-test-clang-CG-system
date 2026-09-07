@@ -1,8 +1,7 @@
-name: Lab testing
+name: Lab testing on push
 
 on:
   push:
-  pull_request:
   workflow_dispatch:
     inputs:
       run-optional-cg:
@@ -21,10 +20,6 @@ jobs:
       image: caseyrgb/rgb-tested:clang20
     steps:
       - uses: actions/checkout@v3
-      - name: Set base branch for pr
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "BASE_BRANCH=origin/${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
       - name: Branch
         working-directory: ${{ github.workspace }}
         run: $TEST_DIR/validate-branch.sh
@@ -35,10 +30,6 @@ jobs:
       image: caseyrgb/rgb-tested:clang20
     steps:
       - uses: actions/checkout@v3
-      - name: Set base branch for pr
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "BASE_BRANCH=origin/${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
       - name: Content
         working-directory: ${{ github.workspace }}
         run: $TEST_DIR/validate-files.sh
@@ -49,10 +40,6 @@ jobs:
       image: caseyrgb/rgb-tested:clang20
     steps:
       - uses: actions/checkout@v3
-      - name: Set base branch for pr
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "BASE_BRANCH=origin/${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
       - name: Author
         working-directory: ${{ github.workspace }}
         run: $TEST_DIR/validate-student.sh
@@ -64,10 +51,6 @@ jobs:
       image: caseyrgb/rgb-tested:clang20
     steps:
       - uses: actions/checkout@v3
-      - name: Set base branch for pr
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "BASE_BRANCH=origin/${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
       - name: Build
         working-directory: ${{ github.workspace }}
         run: $TEST_DIR/build.sh
@@ -85,10 +68,6 @@ jobs:
       image: caseyrgb/rgb-tested:clang20
     steps:
       - uses: actions/checkout@v3
-      - name: Set base branch for pr
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "BASE_BRANCH=origin/${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
       - name: Acceptance
         working-directory: ${{ github.workspace }}
         run: |
@@ -110,10 +89,6 @@ jobs:
     if: ${{ inputs.run-optional-cg != 'skip' }}
     steps:
       - uses: actions/checkout@v3
-      - name: Set base branch for pr
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "BASE_BRANCH=origin/${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
       - name: CG
         working-directory: ${{ github.workspace }}
         run: $TEST_DIR/validate-cg.sh

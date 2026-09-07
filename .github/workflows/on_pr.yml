@@ -1,6 +1,7 @@
 name: Lab testing in pull requests
 
 on:
+  pull_request:
   workflow_dispatch:
     inputs:
       run-optional-cg:
