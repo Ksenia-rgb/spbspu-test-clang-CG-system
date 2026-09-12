@@ -10,7 +10,7 @@ def get_header_guard_name(file_path):
   else:
     right_name = file_path[folder_index + 1::]
 
-  res_name = "" + file_path[0]
+  res_name = "" + right_name[0].upper()
   for i in range(1, len(right_name), 1):
     if (right_name[i] == '-' or right_name[i] == '.'):
       res_name += '_'
@@ -31,22 +31,23 @@ def check_header_guard():
   for file_path in files[2:]:
     file = open(file_path)
 
-    header_guard_name = get_header_guard_name(file_path)
-    line = file.readline()
-    if line != "#ifndef " + header_guard_name:
-      return_code = 1
-      print_warning(file_path, 1)    
+    if file_path.rfind(".hpp") != -1 or file_path.rfind(".h") != -1:
+      header_guard_name = get_header_guard_name(file_path)
+      line = file.readline()
+      if line != "#ifndef " + header_guard_name + '\n':
+        return_code = 1
+        print_error(file_path, 1, header_guard_name)    
     file.close()
 
   return return_code
 
-def print_warning(file_path, str_count):
-  PURPLE = '\033[1;35m'
+def print_error(file_path, str_count, name):
+  RED = '\033[1;31m'
   BOLD = '\033[1;37m'
   RESET = '\033[0m'
 
-  print(f'{BOLD}{file_path}:{str(str_count)}:', f'{PURPLE}warning:{RESET}',
-        f'{BOLD}header guard is missing or does not conform to the required style{RESET}')
+  print(f'{BOLD}{file_path}:{str(str_count)}:', f'{RED}error:{RESET}',
+        f'{BOLD}header guard is missing or does not conform to the required style: {name}{RESET}')
   return
 
 def main():
