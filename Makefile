@@ -251,6 +251,7 @@ $(addprefix tidy-,$(labs)): tidy-%: check-clang-tidy
 		python3 .github/cg/scripts/tidy/complete-tidy-with-case.py \
 			$(tidy_write) $(tidy_general) $(tidy_camel) $(tidy_lower) $(files_all); \
 		echo "[TIDY] check files"; \
+		python3 .github/cg/scripts/tidy/check-header-guard.py "--fix" $(files_all); \
 		$(LATEST_CLANG_TIDY) --config-file=.clang-tidy -header-filter='.*' --warnings-as-errors='*' --quiet $(files_all); \
 	fi
 
