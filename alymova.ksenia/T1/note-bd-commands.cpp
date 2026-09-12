@@ -1,10 +1,10 @@
 #include "note-bd-commands.hpp"
-#include "note-bd.hpp"
 #include <iomanip>
 #include <istream>
 #include <ostream>
 #include <stdexcept>
 #include <string>
+#include "note-bd.hpp"
 
 void alymova::note(std::istream& in, NoteBd& bd)
 {
