@@ -1,7 +1,6 @@
 name: Lab testing on push
 
 on:
-  push:
   workflow_dispatch:
     inputs:
       run-optional-cg:
