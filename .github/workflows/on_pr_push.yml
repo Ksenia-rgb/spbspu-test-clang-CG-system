@@ -25,7 +25,9 @@ jobs:
     container:
       image: caseyrgb/rgb-tested:clang20
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - name: Branch
         working-directory: ${{ github.workspace }}
         run: $TEST_DIR/validate-branch.sh
@@ -35,7 +37,7 @@ jobs:
     container:
       image: caseyrgb/rgb-tested:clang20
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
       - name: Content
         working-directory: ${{ github.workspace }}
         run: $TEST_DIR/validate-files.sh
@@ -45,7 +47,7 @@ jobs:
     container:
       image: caseyrgb/rgb-tested:clang20
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
       - name: Author
         working-directory: ${{ github.workspace }}
         run: $TEST_DIR/validate-student.sh
@@ -56,13 +58,13 @@ jobs:
     container:
       image: caseyrgb/rgb-tested:clang20
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
       - name: Build
         working-directory: ${{ github.workspace }}
         run: $TEST_DIR/build.sh
         shell: bash
       - name: Build results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: labs
           path: ${{ github.workspace }}/out
@@ -73,7 +75,7 @@ jobs:
     container:
       image: caseyrgb/rgb-tested:clang20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Acceptance
         working-directory: ${{ github.workspace }}
         run: |
@@ -81,7 +83,7 @@ jobs:
           $TEST_DIR/acceptance-tests.sh
         shell: bash
       - name: Build results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: labs
           path: ${{ github.workspace }}/out/*/*/acceptance.*
@@ -94,7 +96,7 @@ jobs:
       image: caseyrgb/rgb-tested:clang20
     if: ${{ inputs.run-optional-cg != 'skip' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
       - name: CG
         working-directory: ${{ github.workspace }}
         run: $TEST_DIR/validate-cg.sh
