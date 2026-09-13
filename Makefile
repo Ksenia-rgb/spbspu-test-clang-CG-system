@@ -197,13 +197,13 @@ $(addprefix format-,$(labs)): format-%: check-clang-format
 		python3 .github/cg/scripts/format/check-comments.py "--check" $(files_all); \
 		python3 .github/cg/scripts/format/check-std-spaces.py "--check" $(files_all); \
 		python3 .github/cg/scripts/format/check-alias-length.py "--check" $(files_all); \
-		$(LATEST_CLANG_FORMAT) -style=file:.clang-format -n $(files_all); \
+		$(LATEST_CLANG_FORMAT) -style=file:.clang-format -n -Werror $(files_all) || true; \
 	fi
 	@if [ $(fix) = 1 ]; then \
 		echo "[FORMAT] fix files"; \
 		python3 .github/cg/scripts/format/check-comments.py "--fix" $(files_all); \
 		python3 .github/cg/scripts/format/check-std-spaces.py "--fix" $(files_all); \
-		$(LATEST_CLANG_FORMAT) -style=file:.clang-format -i $(files_all) || true; \
+		$(LATEST_CLANG_FORMAT) -style=file:.clang-format -i -Werror $(files_all) || true; \
 	fi
 
 	@rm -f .clang-format
