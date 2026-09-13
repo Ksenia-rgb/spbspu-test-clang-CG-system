@@ -1,4 +1,4 @@
-name: Lab testing in pull requests
+name: Lab testing
 
 on:
   push:
