@@ -13,7 +13,7 @@ CG points that will be checked and fixed by clang-format:
   19  20  22  33  34  39  40  41  49  52  53  55  57
 
 CG points that will be checked by clang-tidy:
-  8   9   21  23  26  30  32  35  36  37  38  44  45  47  48  50
+  8   9   10  21  23  26  30  32  35  36  37  38  44  45  47  48  50
 
 CG points that will be checked, but you should be carefull with them:
   9   10  22  35  50

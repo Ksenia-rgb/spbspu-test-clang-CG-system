@@ -125,7 +125,7 @@ Makefile автоматически строит программу для ка�
 
 * `doctest-labid`: запуск этапа `acceptance` из Github Actions Workflow локально в докер-контейнере:
   
-        $ make doclint-ivanov.ivan/T1
+        $ make doctest-ivanov.ivan/T1
 
 * `format-labid`: форматирование лабораторной программы с помощью clang-format:
   
